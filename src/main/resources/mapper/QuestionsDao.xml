@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.QuestionsDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.entity.QuestionsEntity" id="questionsMap">
+        <result property="id" column="id"/>
+        <result property="url" column="url"/>
+        <result property="title" column="title"/>
+        <result property="answer" column="answer"/>
+        <result property="img" column="img"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="io.renren.entity.QuestionsEntity">
+		select * from questions where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="io.renren.entity.QuestionsEntity">
+		select * from questions
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from questions 
+	</select>
+	 
+	<insert id="save" parameterType="io.renren.entity.QuestionsEntity">
+		insert into questions
+		(
+			`id`, 
+			`url`, 
+			`title`, 
+			`answer`, 
+			`img`
+		)
+		values
+		(
+			#{id}, 
+			#{url}, 
+			#{title}, 
+			#{answer}, 
+			#{img}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="io.renren.entity.QuestionsEntity">
+		update questions 
+		<set>
+			<if test="url != null">`url` = #{url}, </if>
+			<if test="title != null">`title` = #{title}, </if>
+			<if test="answer != null">`answer` = #{answer}, </if>
+			<if test="img != null">`img` = #{img}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from questions where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from questions where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>
